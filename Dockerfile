@@ -21,9 +21,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . /app
 
-# Expose the port Fly will route traffic to
+# Expose the port the app listens on
 EXPOSE 8080
 
 # Use gunicorn to serve the Flask app
 # app:app -> module:variable
-CMD ["gunicorn", "-w", "3", "-k", "gthread", "-b", "0.0.0.0:${PORT}", "app:app"]
+# Use sh -c so $PORT is expanded by the shell, with a default fallback
+CMD ["sh", "-c", "gunicorn -w 3 -k gthread -b 0.0.0.0:${PORT:-8080} app:app"]
