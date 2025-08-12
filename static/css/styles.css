@@ -1,3 +1,6 @@
+html {
+    scroll-behavior: smooth;
+}
 body {
     height: 300vh;
     width: 100%;
