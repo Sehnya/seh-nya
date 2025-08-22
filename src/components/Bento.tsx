@@ -1,4 +1,3 @@
-import "tailwindcss"
 import "@/public/avatar-me.png"
 import { Mail, Github, Linkedin, Download } from "lucide-react";
 

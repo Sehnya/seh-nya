@@ -1,11 +1,11 @@
+// src/server/index.ts (or wherever your server file is)
 import { serve } from "bun";
 import path from "path";
 import { statSync, existsSync } from "fs";
 
 const PORT = Number(process.env.PORT ?? 3000);
-const HOST = "0.0.0.0";
 const root = process.cwd();
-const publicDir = path.join(root, "public");
+const publicDir = path.join(root, "public");      // optional
 const distDir = path.join(root, "static", "dist");
 
 function fileResponse(filePath: string, contentType = "text/plain") {
@@ -15,10 +15,12 @@ function fileResponse(filePath: string, contentType = "text/plain") {
       headers: {
         "content-type": contentType,
         "content-length": String(stat.size),
-        "cache-control": filePath.includes("/static/") ? "public, max-age=31536000, immutable" : "no-cache",
+        "cache-control": filePath.includes("/static/")
+          ? "public, max-age=31536000, immutable"
+          : "no-cache",
       },
     });
-  } catch (e) {
+  } catch {
     return new Response("Not found", { status: 404 });
   }
 }
@@ -35,11 +37,11 @@ function guessType(filePath: string) {
 
 serve({
   port: PORT,
-  hostname: HOST,
+  hostname: "0.0.0.0",
   async fetch(req) {
     const url = new URL(req.url);
 
-    // API routes
+    // API
     if (url.pathname.startsWith("/api/")) {
       if (url.pathname === "/api/hello") {
         return Response.json({ message: "Hello from Bun" });
@@ -47,26 +49,31 @@ serve({
       return new Response("Not Found", { status: 404 });
     }
 
-    // Serve static assets from /static/dist
-    if (url.pathname.startsWith("/static/")) {
-      const rel = url.pathname.replace("/static/", "");
+    // Built assets under /static/dist/*
+    if (url.pathname.startsWith("/static/dist/")) {
+      const rel = url.pathname.slice("/static/dist/".length);
       const filePath = path.join(distDir, rel);
-      if (existsSync(filePath)) {
-        return fileResponse(filePath, guessType(filePath));
-      }
+      if (existsSync(filePath)) return fileResponse(filePath, guessType(filePath));
       return new Response("Not Found", { status: 404 });
     }
 
-    // Serve public files (e.g., favicon)
+    // Optional: raw files from /public (favicon, etc.)
     const maybePublic = path.join(publicDir, url.pathname);
     if (existsSync(maybePublic) && !maybePublic.endsWith("/")) {
       return fileResponse(maybePublic, guessType(maybePublic));
     }
 
-    // SPA fallback -> static/dist/index.html
-    const indexHtml = path.join(distDir, "index.html");
-    return fileResponse(indexHtml, "text/html; charset=utf-8");
+    // SPA fallback → serve index.html (prefer built, fallback to public)
+    const builtIndex = path.join(distDir, "index.html");
+    if (existsSync(builtIndex)) {
+      return fileResponse(builtIndex, "text/html; charset=utf-8");
+    }
+    const publicIndex = path.join(publicDir, "index.html");
+    if (existsSync(publicIndex)) {
+      return fileResponse(publicIndex, "text/html; charset=utf-8");
+    }
+    return new Response("index.html not found", { status: 404 });
   },
 });
 
-console.log(`➜  Server running on ${HOST}:${PORT}`);
+console.log(`➜  Server running on 0.0.0.0:${PORT}`);

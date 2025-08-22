@@ -102,3 +102,18 @@ Your service should use:
 - Removed Flask-related files and scripts for a cohesive Bun-only deploy.
 - Railway build/start commands are defined in `railway.toml`.
 - Server binds to `0.0.0.0` and serves assets from `/static/dist`, with SPA fallback to `static/dist/index.html`.
+
+## GitHub Actions: Railway Deploy (optional)
+If pushes to GitHub aren’t triggering a Railway deploy/build (and you don’t see build logs in Railway), you can enable a simple CI workflow that deploys via Railway CLI on every push to main/master.
+
+1) Add the following repository secrets in your GitHub repo settings:
+   - RAILWAY_TOKEN: your Railway account token (railway login -> railway whoami --json)
+   - RAILWAY_PROJECT_ID: your Railway project ID (railway status shows it, or from project settings)
+   - RAILWAY_SERVICE_NAME: the target service name in Railway (as shown in the UI)
+
+2) The workflow lives at .github/workflows/railway-deploy.yml and will:
+   - Install Bun and dependencies
+   - Build the frontend (bun run build)
+   - Deploy with railway up
+
+This guarantees a build and deploy is triggered on push, and Railway will show the build logs for that deploy.

@@ -1,5 +1,4 @@
-# Railway deployment configuration for Bun server
-
+# railway.toml
 [build]
 builder = "nixpacks"
 buildCommand = "bun install && bun run build"
