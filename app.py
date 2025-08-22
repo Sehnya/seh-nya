@@ -52,4 +52,5 @@ if __name__ == "__main__":
     # Using Flask's built-in server for simplicity
     # Ensure frontend is built first: `bun run build`
     print(f"➜  Flask server running on http://localhost:{port}")
+    port = int(os.environ.get("PORT", 3000))
     app.run(host="0.0.0.0", port=port)

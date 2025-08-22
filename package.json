@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "build": "bun run build.ts",
-    "serve": "bun run src/server/index.ts",
-    "start": "bun run src/server/index.ts",
-    "dev": "bun run build.ts && bun run src/server/index.ts",
+    "serve": "bun run ./src/server/index.ts",
+    "start": "bun run ./src/server/index.ts",
+    "dev": "bun run build.ts && bun run ./src/server/index.ts",
     "py:serve": "python3 app.py"
   },
   "devDependencies": {
@@ -29,5 +29,6 @@
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animated": "^2.0.0",
     "tw-animate-css": "^1.3.7"
-  }
+  },
+  "packageManager": "bun@1.1.0"
 }

@@ -1,8 +1,9 @@
 import { serve } from "bun";
 import path from "path";
-import { statSync, createReadStream, existsSync } from "fs";
+import { statSync, existsSync } from "fs";
 
-const port = Number(process.env.PORT || 3000);
+const PORT = Number(process.env.PORT ?? 3000);
+const HOST = "0.0.0.0";
 const root = process.cwd();
 const publicDir = path.join(root, "public");
 const distDir = path.join(root, "static", "dist");
@@ -33,8 +34,8 @@ function guessType(filePath: string) {
 }
 
 serve({
-  port,
-  hostname: "0.0.0.0",
+  port: PORT,
+  hostname: HOST,
   async fetch(req) {
     const url = new URL(req.url);
 
@@ -62,10 +63,10 @@ serve({
       return fileResponse(maybePublic, guessType(maybePublic));
     }
 
-    // SPA fallback -> public/index.html
-    const indexHtml = path.join(publicDir, "index.html");
+    // SPA fallback -> static/dist/index.html
+    const indexHtml = path.join(distDir, "index.html");
     return fileResponse(indexHtml, "text/html; charset=utf-8");
   },
 });
 
-console.log(`➜  Server running on http://localhost:${port}`);
+console.log(`➜  Server running on ${HOST}:${PORT}`);
