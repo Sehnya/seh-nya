@@ -1,13 +1,13 @@
-# Railway deployment configuration for Bun + React + Tailwind app
+# Railway deployment configuration for Flask (Gunicorn) + Bun-built frontend
 
 [build]
-# Use Nixpacks builder and run Bun install + build
+# Use Nixpacks builder; install deps and build frontend assets
 builder = "NIXPACKS"
-buildCommand = "bun install && bun run build"
+buildCommand = "bun install && bun run build && python3 -m pip install -r requirements.txt"
 
 [deploy]
-# Start the Bun server; Railway will provide PORT env var which the server uses
-startCommand = "bun start"
+# Start the Flask app via Gunicorn; Railway provides PORT env var
+startCommand = "gunicorn -w 2 -k gthread -b 0.0.0.0:$PORT app:app"
 healthcheckPath = "/"
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3

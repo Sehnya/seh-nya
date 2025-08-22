@@ -2,6 +2,10 @@
 @import "tailwindcss/theme";
 @import "tailwindcss-animated";
 
+
+html, body, #root { height: 100%; }
+
+
 /* CSS variables for shadcn/ui design tokens (Tailwind v4 recommended pattern) */
 @theme {
   --color-background: hsl(0 0% 100%);

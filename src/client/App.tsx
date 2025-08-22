@@ -28,34 +28,51 @@ function About() {
 export default function App() {
   return (
     <FadeContent>
+      {/* Root establishes stacking context but no opaque bg that would cover Prism */}
+      <div className="relative min-h-[100dvh] w-full overflow-hidden antialiased font-mono">
 
-<div className={ "w-screen min-h-screen bg-black z-0 p-0 m-0 font-mono"}>
-  <Prism
-    animationType="hover"
-    timeScale={0.5}
-    height={3.6}
-    baseWidth={5.5}
-    scale={3.6}
-    hueShift={0}
-    colorFrequency={1}
-    noise={0}
-    glow={1}
-  />
-<div className="relative top-0 left-0 w-full min-h-screen flex justify-center items-start sm:items-center antialiased overflow-y-auto">
-<div className="w-3/4 px-4 py-16 mx-auto sm:px-6 lg:px-8 text-center text-3xl text-white ">
-    <TextType
-  text={["Hi, I’m Sehnya — Full-Stack Developer.", "I build clean, modern apps with code & creativity.", "Turning ideas into full-stack interactive web experiences."]}
-  typingSpeed={75}
-  pauseDuration={1500}
-  showCursor={true}
-  cursorCharacter="|"
-/>
-    <Bento/>
-</div>
-</div>
-</div></FadeContent>
+        {/* Prism layer: full-viewport, sits at z-0 */}
+        <div className="fixed inset-0 z-0">
+          {/* optional: give the Prism layer a black base */}
+          <div className="absolute inset-0 bg-black" />
+          <Prism
+            className="w-full h-full"
+            animationType="hover"
+            timeScale={0.5}
+            height={3.6}
+            baseWidth={5.5}
+            scale={3.6}
+            hueShift={0}
+            colorFrequency={1}
+            noise={0}
+            glow={1}
+          />
+        </div>
+
+        {/* Foreground content: above Prism */}
+        <div className="relative z-10 flex items-start sm:items-center justify-center min-h-[100dvh]">
+          <div className="w-11/12 sm:w-3/4 px-4 py-16 mx-auto text-center text-3xl text-white">
+            <TextType
+              text={[
+                "Hi, I’m Sehnya — Full-Stack Developer.",
+                "I build clean, modern apps with code & creativity.",
+                "Turning ideas into full-stack interactive web experiences."
+              ]}
+              typingSpeed={75}
+              pauseDuration={1500}
+              showCursor
+              cursorCharacter="|"
+            />
+            <div className="mt-8"><Bento /></div>
+
+          </div>
+        </div>
+
+      </div>
+    </FadeContent>
   );
 }
+
 
 function ApiTester() {
   async function callApi() {
