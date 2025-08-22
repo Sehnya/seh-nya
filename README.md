@@ -59,39 +59,46 @@ Tip: keep your Bun lockfile committed so Nixpacks reliably detects Bun.
 
 ---
 
-## Optional: Using Python + Flask locally
-Flask can serve the built React app and an example API for local tinkering. Railway does not use Flask in this setup.
+## Deployment testing with Railway CLI
+To verify deployment locally with Railway CLI:
 
-1) Install Python dependencies:
+1) Install Railway CLI (if not already):
 
 ```bash
-python3 -m pip install -r requirements.txt
+npm i -g @railway/cli
 ```
 
-2) Build the frontend assets to `static/dist` (same as before):
+2) Login and link your project:
 
 ```bash
+railway login
+railway link
+```
+
+3) Run a local build and start preview using your app's configuration:
+
+```bash
+# Build assets
+bun install
 bun run build
+
+# Start the Bun server (same as Railway)
+bun run serve
 ```
 
-3) Run the Flask server:
+4) Deploy from CLI:
 
 ```bash
-# Option A: via package.json script
-bun run py:serve
-
-# Option B: directly
-python3 app.py
+railway up
 ```
 
-Open http://localhost:3000. The React Router routes like `/about` will work on refresh.
-
-### Flask notes
-- Serves `/static/dist/*` from `static/dist` (built JS/CSS).
-- Serves any files in `/public` (e.g., `/favicon.ico`).
-- SPA fallback is handled by returning `public/index.html` (the Bun server uses `static/dist/index.html`).
+Your service should use:
+- Build: `bun install && bun run build`
+- Start: `bun run serve`
+- Healthcheck: `/`
 
 ## Summary of changes
-- Bun is the primary and only server in deployment (Railway). 
+- Bun is the primary and only server in deployment (Railway).
+- Removed Flask-related files and scripts for a cohesive Bun-only deploy.
 - Railway build/start commands are defined in `railway.toml`.
 - Server binds to `0.0.0.0` and serves assets from `/static/dist`, with SPA fallback to `static/dist/index.html`.

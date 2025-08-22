@@ -6,8 +6,7 @@
     "build": "bun run build.ts",
     "serve": "bun run ./src/server/index.ts",
     "start": "bun run ./src/server/index.ts",
-    "dev": "bun run build.ts && bun run ./src/server/index.ts",
-    "py:serve": "python3 app.py"
+    "dev": "bun run build.ts && bun run ./src/server/index.ts"
   },
   "devDependencies": {
     "@types/bun": "^1.2.20",
