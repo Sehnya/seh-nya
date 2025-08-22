@@ -1,91 +1,83 @@
-# Sehnya Edwards — Portfolio
+# Bun + React + Tailwind (v4) + shadcn/ui starter
 
-A clean, fast, and simple personal portfolio built with Flask to showcase my work as a self‑taught full‑stack web developer. This site highlights my projects, skills, and the technologies I use to design and build modern web experiences.
+A minimal full-stack starter using Bun for both backend and build, React + React Router on the frontend, Tailwind CSS v4, and shadcn-style components.
 
-## Why this project works
-- Straightforward stack: Flask + vanilla templates/CSS for a snappy, low‑overhead site.
-- Clear UX focus: concise content, accessible design, and intentional motion/animation.
-- Performance‑minded: minimal dependencies and static assets served efficiently.
-- Production‑ready: containerized via Docker; deployable (e.g., Fly.io config included).
-- Extensible foundation: simple to evolve into a richer Flask/React/Vue hybrid if needed.
+## Getting started
 
-## My strengths
-- Full‑stack delivery: from ideation and UX to backend APIs, database models, and deployment.
-- Rapid prototyping with AI: I frequently leverage AI (ChatGPT) to explore solutions, accelerate iteration, and improve quality while maintaining code clarity and ownership.
-- Frontend craft: accessible UI, responsive layouts, and design systems (Tailwind or custom CSS).
-- Backend pragmatism: clean REST APIs with Flask/FastAPI, auth, pagination, validation, and logging.
-- Data layer experience: schema design, migrations, and query performance (e.g., with Prisma/ORMs).
-- DevOps basics: containerization, environment management, and cloud deployments.
+Install deps:
 
-## Technologies I work with
-- Languages: JavaScript/TypeScript, Python, HTML, CSS
-- Frontend: React, Vue, Tailwind CSS
-- Backend: Flask (this project), FastAPI
-- Databases/ORMs: Prisma, PostgreSQL, SQLite
-- Tooling & DevOps: Docker, GitHub, Fly.io, Vite/Webpack, pytest
-
-> Note: This portfolio specifically uses Python + Flask with static assets; the icons in the site reflect a broader toolset I use across projects.
-
-## Highlighted projects
-- Stack‑it.dev — A developer resource and tooling hub designed to be fast, clear, and distraction‑free.
-  - Highlights: clean information architecture, mobile‑first UI, optimized images, accessible color contrast.
-  - My role: design, frontend, content, deploy.
-  - Status: live — https://stack-it.dev
-  - Screenshot: static/images/stack-it.png
-
-- Gig Tracker (GT‑1) — A simple, focused dashboard to log gigs/jobs, pay, dates, and notes.
-  - Highlights: CRUD flows, searchable list, lightweight local persistence, printable summaries.
-  - My role: UX, frontend, data modeling.
-  - Screenshot: static/images/GT-1.jpg
-
-- This portfolio site — A minimal Flask app to showcase projects and skills.
-  - Stack: Python, Flask, Jinja templates, vanilla JS/CSS; Docker + Fly.io for deploy.
-  - Highlights: zero‑JS framework overhead, fast TTFB, subtle motion, accessible typography.
-
-- UI Experiments — Small React/Vue/Tailwind components and patterns I iterate on.
-  - Examples: animated navigation, card grids, skeleton loading, scroll‑based reveals.
-  - Browse on GitHub: https://github.com/sehnya
-
-If you’d like me to add more links, detailed case studies, or short videos/GIFs, I can add them quickly.
-
-## Running this portfolio locally
-
-### Prerequisites
-- Python 3.10+
-- pip
-
-### Setup
 ```bash
-pip install -r requirements.txt
-python app.py
-```
-The app should start on http://127.0.0.1:5000 (or as configured in app.py).
-
-### Docker (optional)
-A Dockerfile is included.
-```bash
-docker build -t sehnyaportfolio .
-docker run -p 5000:5000 sehnyaportfolio
+bun install
 ```
 
-### Deployment
-A `fly.toml` is present for Fly.io deployment. Configure your Fly app and secrets, then deploy:
+Build the frontend assets to `static/dist`:
+
 ```bash
-fly launch  # or `fly deploy` if already configured
+bun run build
 ```
 
-## Repository structure (excerpt)
-- `app.py` — Flask application entry point
-- `templates/index.html` — Main page template
-- `static/` — Styles and images
-  - `static/css/styles.css`
-  - `static/images/*`
-- `requirements.txt` — Python dependencies
-- `Dockerfile`, `fly.toml` — Containerization and deployment config
+Run the Bun server (serves API + SPA):
 
-## Contact
-- GitHub: https://github.com/sehnya
-- LinkedIn: https://www.linkedin.com/in/sehnya-edwards-8315541a8
+```bash
+bun run serve
+```
+
+Open http://localhost:3000. The React Router routes like `/about` will work on refresh. Click "Call API" to test the `/api/hello` endpoint.
+
+## Scripts
+- `bun run build`: bundles `src/client/main.tsx` and generates Tailwind CSS to `static/dist/styles.css`.
+- `bun run serve` or `bun start`: runs the Bun server at `src/server/index.ts` (port 3000).
+
+## Project layout
+- `public/index.html` – SPA HTML shell loaded by the server for all non-API routes.
+- `src/client` – React app entry (`main.tsx`) and App router.
+- `src/components/ui` – shadcn-style UI components (local cva + tailwind-merge helpers).
+- `src/styles/globals.css` – Tailwind v4 + design tokens.
+- `static/dist` – built artifacts (generated).
+
+## Notes
+- Tailwind v4 is config-less by default; we provide tokens in `globals.css` using `@theme` and some common shadcn tokens.
+- You can add more shadcn/ui components by copying patterns into `src/components/ui`.
+
 
 ---
-If you’d like this README to feature more projects, a timeline, badges, or a tech matrix with links, let me know and I’ll iterate.
+
+## Using Python + Flask to serve the frontend (alternative to Bun server)
+
+You can serve the built React app and API using Flask instead of the Bun server.
+
+1) Install Python dependencies:
+
+```bash
+python3 -m pip install -r requirements.txt
+```
+
+2) Build the frontend assets to static/dist (same as before):
+
+```bash
+bun run build
+```
+
+3) Run the Flask server:
+
+```bash
+# Option A: via package.json script
+bun run py:serve
+
+# Option B: directly
+python3 app.py
+```
+
+Open http://localhost:3000. The React Router routes like /about will work on refresh. Click "Call API" to test the /api/hello endpoint.
+
+### Notes
+- Flask is configured to serve:
+  - /static/dist/* from static/dist (built JS/CSS)
+  - Any files in /public (e.g., /favicon.ico)
+  - A catch-all fallback to /public/index.html so client routing works
+- Build output paths are already aligned with Flask (publicPath "/static/dist" in build.ts).
+
+## Scripts (updated)
+- bun run build: bundles src/client/main.tsx and generates Tailwind CSS to static/dist/styles.css.
+- bun run serve or bun start: runs the Bun server at src/server/index.ts (port 3000).
+- bun run py:serve: runs the Flask server (python3 app.py) serving the same assets and routes.
