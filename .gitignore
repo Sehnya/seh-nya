@@ -1,2 +1,9 @@
 # Ignore Bun's binary lockfile; we track the text lock instead
 bun.lockb
+
+# Build artifacts (generated at deploy/build time)
+static/dist/
+
+# Stray legacy bundles (should not exist; server serves from static/dist only)
+static/main.js
+static/main.js.map

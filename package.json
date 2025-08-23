@@ -2,9 +2,13 @@
   "name": "seh-nya",
   "type": "module",
   "private": true,
+  "imports": {
+    "@/*": "./*"
+  },
   "scripts": {
     "build": "bun run build.ts",
-    "serve": "bun run ./src/server/index.ts",
+    "serve": "bun ./src/server/index.ts",
+    "start": "bun ./src/server/index.ts",
     "dev": "bun --hot ./src/server/index.ts"
   },
   "devDependencies": {
