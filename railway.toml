@@ -4,6 +4,7 @@ buildCommand = "bun install && bun run build"
 
 [deploy]
 startCommand = "bun run ./src/server/index.ts"
-healthcheckPath = "/"
+healthcheckPath = "/api/hello"   # safer healthcheck, since / may 404 in CI
 
-SERVE_INDEX='dist'
+[env]
+SERVE_INDEX = "dist"

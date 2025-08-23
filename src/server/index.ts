@@ -57,6 +57,12 @@ if (url.pathname.startsWith("/static/")) {
   let rel = url.pathname.slice("/static/".length);
   // Normalize to avoid double "dist" when client requests /static/dist/*
   if (rel.startsWith("dist/")) rel = rel.slice("dist/".length);
+
+  // Alias common top-level asset paths to where Bun actually outputs them
+  // These help when index.html points to /static/main.js or /static/styles.css
+  if (rel === "main.js") rel = path.join("client", "main.js");
+  if (rel === "styles.css") rel = path.join("styles", "globals.css");
+
   const filePath = path.join(distDir, rel);
   if (existsSync(filePath)) return fileResponse(filePath, guessType(filePath));
   return new Response("Not Found", { status: 404 });
