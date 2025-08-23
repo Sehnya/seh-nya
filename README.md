@@ -1,246 +1,67 @@
-# Bun + React + Tailwind (v4) + shadcn/ui starter
+# Sehnya Edwards — Bun + React + Tailwind starter
 
-A minimal full‑stack starter using Bun for both backend and build, React + React Router on the frontend, Tailwind CSS v4, and shadcn‑style components.
+Hi, I’m Sehnya Edwards — a full‑stack developer with a background in healthcare. I enjoy building fast, accessible web apps with clear UX and pragmatic tooling. This repository is a minimal, production‑ready setup using Bun for both building and serving, React on the frontend, and Tailwind CSS v4 for styling.
 
-Bun is the default and only server used in deployment. Flask support exists only as a local alternative for experimentation.
+## Overview
 
-## Getting started (local)
+- Runtime/build: Bun
+- Frontend: React + React Router (SPA)
+- Styling: Tailwind CSS v4 (no config) with a small UI primitives layer
+- Bundling: `bun build` with a Tailwind plugin
+- Deployment: Railway (Nixpacks), single process Bun server
+- Output: All assets are emitted to `static/dist` and served from there
 
-Install deps:
+## Project structure
 
-```bash
-bun install
-```
+- `src/client` — React client app (entry: `main.tsx`).
+- `src/components` — UI components, including the hero/Bento grid.
+- `src/styles/globals.css` — Tailwind v4 + design tokens.
+- `src/server/index.ts` — Bun server (serves API + static + SPA fallback).
+- `public/` — Static assets to be copied into the build (e.g., `resume.pdf`, `avatar-me.png`).
+- `static/dist/` — Build output (generated; do not commit).
 
-Build the frontend assets to `static/dist`:
+## Local development
 
-```bash
-bun run build
-```
+1) Install dependencies:
 
-Run the Bun server (serves API + SPA):
-
-```bash
-bun run serve
-```
-
-Open http://localhost:3000. React Router routes like `/about` will work on refresh. Click "Call API" to test the `/api/hello` endpoint.
-
-## Deployment (Railway)
-This repo includes a `railway.toml` that instructs Railway to use Bun only.
-
-- Build: `bun install && bun run build`
-- Start: `bun run serve`
-- Healthcheck: `/api/hello`
-
-Nothing else is required in the Railway UI if `railway.toml` is at the repo root. If Railway still shows "no start command", set the same Build/Start commands manually in Build & Deploy.
-
-Tip: keep your Bun lockfile committed so Nixpacks reliably detects Bun. We standardize on the text bun.lock in this repo (bun.lockb is ignored).
-
-## Scripts
-- `bun run build`: bundles `src/client/main.tsx` and generates Tailwind CSS to `static/dist/styles.css`.
-- `bun run serve` or `bun start`: runs the Bun server at `src/server/index.ts` (PORT, default 3000). The server binds to `0.0.0.0` for deployment.
-- `bun run dev`: builds then serves.
-- `bun run py:serve`: optional Flask server for local testing only (see below).
-
-## Project layout
-- `public/index.html` – SPA HTML shell (copied into `static/dist/index.html` during build).
-- `src/client` – React app entry (`main.tsx`) and App router.
-- `src/components/ui` – shadcn‑style UI components (local cva + tailwind‑merge helpers).
-- `src/styles/globals.css` – Tailwind v4 + design tokens.
-- `static/dist` – built artifacts (generated). Assets are served from `/static/dist/*`.
-
-## Notes
-- Public folder is optional at runtime: the server falls back to `static/dist/index.html`. Vite‑style public assets (e.g., favicon) can still live under `public/` and are served directly if present.
-- Tailwind v4 is config‑less by default; tokens are provided in `globals.css` using `@theme` plus some shadcn tokens.
-- After `bun run build`, verify:
-  - `static/dist/index.html` exists.
-  - Other assets live under `static/dist/*` and load from `/static/dist/...`.
-
----
-
-## Deployment testing with Railway CLI
-To verify deployment locally with Railway CLI:
-
-1) Install Railway CLI (if not already):
-
-```bash
-npm i -g @railway/cli
-```
-
-2) Login and link your project:
-
-```bash
-railway login
-railway link
-```
-
-3) Run a local build and start preview using your app's configuration:
-
-```bash
-# Build assets
-bun install
-bun run build
-
-# Start the Bun server (same as Railway)
-bun run serve
-```
-
-4) Deploy from CLI:
-
-```bash
-railway up
-```
-
-Your service should use:
-- Build: `bun install && bun run build`
-- Start: `bun run serve`
-- Healthcheck: `/api/hello`
-
-## Summary of changes
-- Bun is the primary and only server in deployment (Railway).
-- Removed Flask-related files and scripts for a cohesive Bun-only deploy.
-- Railway build/start commands are defined in `railway.toml`.
-- Server binds to `0.0.0.0` and serves assets from `/static/dist`, with SPA fallback to `static/dist/index.html`.
-
-## GitHub Actions: Railway Deploy (optional)
-If pushes to GitHub aren’t triggering a Railway deploy/build (and you don’t see build logs in Railway), you can enable a simple CI workflow that deploys via Railway CLI on every push to main/master.
-
-1) Add the following repository secrets in your GitHub repo settings:
-   - RAILWAY_TOKEN: your Railway account token (railway login -> railway whoami --json)
-   - RAILWAY_PROJECT_ID: your Railway project ID (railway status shows it, or from project settings)
-   - RAILWAY_SERVICE_NAME: the target service name in Railway (as shown in the UI)
-
-2) The workflow lives at .github/workflows/railway-deploy.yml and will:
-   - Install Bun and dependencies
-   - Build the frontend (bun run build)
-   - Deploy with railway up
-
-This guarantees a build and deploy is triggered on push, and Railway will show the build logs for that deploy.
-
-# Bun + React + Tailwind (v4) + shadcn/ui starter
-
-A minimal full‑stack starter using Bun for both backend and build, React + React Router on the frontend, Tailwind CSS v4, and shadcn‑style components.
-
-Bun is the default and only server used in deployment. Flask support exists only as a local alternative for experimentation.
-
-## Getting started (local)
-
-Install deps:
-
-```bash
-bun install
-```
-
-Build the frontend assets to `static/dist`:
-
-```bash
-bun run build
-```
-
-Run the Bun server (serves API + SPA):
-
-```bash
-bun run serve
-```
-
-Open http://localhost:3000. React Router routes like `/about` will work on refresh. Click "Call API" to test the `/api/hello` endpoint.
+- `bun run build` — Bundles the client and Tailwind output into `static/dist` and copies `public/*` into the build.
+- `bun run dev` — Local dev: builds then serves.
+- `bun run start` or `bun run src/server/index.ts` — Starts the Bun server (PORT defaults to 3000).
 
 ## Deployment (Railway)
-This repo includes a `railway.toml` that instructs Railway to use Bun only.
 
-- Build: `bun install && bun run build`
-- Start: `bun run serve`
-- Healthcheck: `/api/hello`
+This repo includes `railway.toml` configured for Nixpacks + Bun:
 
-Nothing else is required in the Railway UI if `railway.toml` is at the repo root. If Railway still shows "no start command", set the same Build/Start commands manually in Build & Deploy.
+- Build command: `bun install && bun run build`
+- Start command: `bun run ./src/server/index.ts` (equivalent to `bun run start`)
+- Healthcheck path: `/api/hello`
 
-Tip: keep your Bun lockfile committed so Nixpacks reliably detects Bun. We standardize on the text bun.lock in this repo (bun.lockb is ignored).
+Steps:
+1) Push to the connected GitHub repo or deploy via Railway CLI.
+2) Railway sets `PORT`; the server binds to `0.0.0.0` and uses `process.env.PORT`.
+3) Confirm logs show: `Server running on http://0.0.0.0:PORT`.
 
-## Scripts
-- `bun run build`: bundles `src/client/main.tsx` and generates Tailwind CSS to `static/dist/styles.css`.
-- `bun run serve` or `bun start`: runs the Bun server at `src/server/index.ts` (PORT, default 3000). The server binds to `0.0.0.0` for deployment.
-- `bun run dev`: builds then serves.
-- `bun run py:serve`: optional Flask server for local testing only (see below).
+If Railway says “no start command,” ensure `railway.toml` is at the repo root or set the commands manually in the service settings.
 
-## Project layout
-- `public/index.html` – SPA HTML shell (copied into `static/dist/index.html` during build).
-- `src/client` – React app entry (`main.tsx`) and App router.
-- `src/components/ui` – shadcn‑style UI components (local cva + tailwind‑merge helpers).
-- `src/styles/globals.css` – Tailwind v4 + design tokens.
-- `static/dist` – built artifacts (generated). Assets are served from `/static/dist/*`.
+## How it works
 
-## Notes
-- Public folder is optional at runtime: the server falls back to `static/dist/index.html`. Vite‑style public assets (e.g., favicon) can still live under `public/` and are served directly if present.
-- Tailwind v4 is config‑less by default; tokens are provided in `globals.css` using `@theme` plus some shadcn tokens.
-- After `bun run build`, verify:
-  - `static/dist/index.html` exists.
-  - Other assets live under `static/dist/*` and load from `/static/dist/...`.
+- Build: `build.ts` runs `bun build` on `src/client/main.tsx` and `src/styles/globals.css`, emits `static/dist/main.js` and `static/dist/styles.css`, creates `static/dist/index.html`, and copies all files from `public/` into `static/dist/`.
+- Serve: `src/server/index.ts` handles:
+  - `GET /api/hello` — simple JSON healthcheck.
+  - Static files: any request path that matches a file under `static/dist` (e.g., `/assets/*`, `/resume.pdf`, `/avatar-me.png`).
+  - SPA fallback: serves `static/dist/index.html` for app routes without an extension.
 
----
+Security and perf:
+- Static assets are served with `immutable` caching; HTML is `no-cache`.
+- `X-Content-Type-Options: nosniff` is set.
+- A guard prevents path traversal outside `static/dist`.
 
-## Deployment testing with Railway CLI
-To verify deployment locally with Railway CLI:
+## Common pitfalls (and fixes included)
 
-1) Install Railway CLI (if not already):
+- Avatar missing/distorted: The avatar is now served from `/avatar-me.png` (copied from `public/`) and rendered using `aspect-square object-cover rounded-full` to avoid distortion.
+- Public files 404: The build now copies `public/*` into `static/dist`, and the server can serve them by path (e.g., `/resume.pdf`).
+- Asset paths like `/assets/...`: The server resolves any path that exists within `static/dist`, so bundler‑emitted assets work.
 
-```bash
-npm i -g @railway/cli
-```
+## About me
 
-2) Login and link your project:
-
-```bash
-railway login
-railway link
-```
-
-3) Run a local build and start preview using your app's configuration:
-
-```bash
-# Build assets
-bun install
-bun run build
-
-# Start the Bun server (same as Railway)
-bun run serve
-```
-
-4) Deploy from CLI:
-
-```bash
-railway up
-```
-
-Your service should use:
-- Build: `bun install && bun run build`
-- Start: `bun run serve`
-- Healthcheck: `/api/hello`
-
-## Summary of changes
-- Bun is the primary and only server in deployment (Railway).
-- Removed Flask-related files and scripts for a cohesive Bun-only deploy.
-- Railway build/start commands are defined in `railway.toml`.
-- Server binds to `0.0.0.0` and serves assets from `/static/dist`, with SPA fallback to `static/dist/index.html`.
-
-## Railway up checklist & troubleshooting
-- Pre-checks
-  - Ensure `bun.lock` and `railway.toml` are committed.
-  - Confirm `bun --version` and `railway --version` locally.
-  - Build locally once: `bun run build` and verify `static/dist/index.html` exists.
-- Environment
-  - Railway will provide `PORT`. Our server reads `process.env.PORT` and binds to `0.0.0.0`.
-  - Optional: `SERVE_INDEX` env can be set to `public` to prefer serving `public/index.html` when both exist.
-- Static assets
-  - Server serves only from `/static/*` -> `static/dist/*` with correct content types and `X-Content-Type-Options: nosniff`.
-  - No raw binary rendering; unknown extensions default to `application/octet-stream`.
-- Commands on Railway
-  - Build Command: `bun install && bun run build`
-  - Start Command: `bun start`
-- Healthcheck
-  - Path: `/api/hello` should return JSON `{ message: "Hello from Bun" }`.
-- Logs and debugging
-  - Use `railway logs -f` to tail logs. Look for `Server running on 0.0.0.0:PORT`.
-  - If build fails due to TypeScript config, we fixed `tsconfig.json`; re-deploy.
-  - If assets 404, confirm build created `static/dist/*` and that index.html links use `/static/main.js` and `/static/styles.css`.
-  - If Railway can’t detect Bun, ensure `bun.lock` exists and `bun.lockb` isn’t tracked; nixpacks builder is configured via `railway.toml`.
+I’m a full‑stack developer who values reliability, performance, and accessibility. With a healthcare background, I approach software with empathy and a focus on user needs. I like shipping features with clean, maintainable code and measurable impact. If you’d like to collaborate, reach out via email or LinkedIn — I’m always open to interesting problems.

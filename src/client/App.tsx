@@ -1,8 +1,8 @@
 import { Button } from "../components/ui/button";
-  import Prism from '@/src/components/Prism.tsx';
-import FadeContent from "@/src/components/FadeContent.tsx";
-import {Bento} from "@/src/components/Bento.tsx";
-import TextType from "@/src/components/TextType.tsx";
+import Prism from "../components/Prism";
+import FadeContent from "../components/FadeContent";
+import { Bento } from "../components/Bento";
+import TextType from "../components/TextType";
 
 function Home() {
   return (

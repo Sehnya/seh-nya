@@ -1,28 +1,22 @@
+// src/server/index.ts
 import { serve } from "bun";
 import path from "path";
-import { statSync, existsSync } from "fs";
+import { existsSync, statSync } from "fs";
 
 const PORT = Number(process.env.PORT ?? 3000);
-const root = process.cwd();
-const publicDir = path.join(root, "public");
-const distDir = path.join(root, "static", "dist");
+const distDir = path.join(process.cwd(), "static", "dist");
 
-function fileResponse(filePath: string, contentType = "application/octet-stream") {
-  try {
-    const stat = statSync(filePath);
-    return new Response(Bun.file(filePath), {
-      headers: {
-        "content-type": contentType,
-        "content-length": String(stat.size),
-        "x-content-type-options": "nosniff",
-        "cache-control": filePath.includes(`${path.sep}static${path.sep}`)
-          ? "public, max-age=31536000, immutable"
-          : "no-cache",
-      },
-    });
-  } catch {
-    return new Response("Not found", { status: 404 });
-  }
+function send(file: string, type: string, cache: "static" | "html" = "static") {
+  const stat = statSync(file);
+  const isHtml = cache === "html";
+  return new Response(Bun.file(file), {
+    headers: {
+      "content-type": type,
+      "content-length": String(stat.size),
+      "x-content-type-options": "nosniff",
+      "cache-control": isHtml ? "no-cache" : "public, max-age=31536000, immutable",
+    },
+  });
 }
 
 function guessType(filePath: string) {
@@ -34,75 +28,60 @@ function guessType(filePath: string) {
   if (lower.endsWith(".ico")) return "image/x-icon";
   if (lower.endsWith(".png")) return "image/png";
   if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "image/jpeg";
+  if (lower.endsWith(".gif")) return "image/gif";
   if (lower.endsWith(".webp")) return "image/webp";
+  if (lower.endsWith(".avif")) return "image/avif";
   if (lower.endsWith(".pdf")) return "application/pdf";
-  if (lower.endsWith(".json") || lower.endsWith(".map")) return "application/json";
+  if (lower.endsWith(".json")) return "application/json; charset=utf-8";
   if (lower.endsWith(".wasm")) return "application/wasm";
+  if (lower.endsWith(".map")) return "application/octet-stream";
   return "application/octet-stream";
+}
+
+// Ensure a path is within distDir to avoid path traversal
+function isWithinDist(p: string) {
+  const resolved = path.resolve(p);
+  const base = path.resolve(distDir);
+  return resolved === base || resolved.startsWith(base + path.sep);
 }
 
 serve({
   port: PORT,
   hostname: "0.0.0.0",
-  async fetch(req) {
+  fetch(req) {
     const url = new URL(req.url);
 
-    // API
-    if (url.pathname.startsWith("/api/")) {
-      if (url.pathname === "/api/hello") {
-        return Response.json({ message: "Hello from Bun" });
+    if (url.pathname === "/api/hello") {
+      return Response.json({ message: "Hello from Bun" });
+    }
+
+    // Serve explicit /static/dist/* paths (back-compat)
+    if (url.pathname.startsWith("/static/dist/")) {
+      const rel = url.pathname.replace("/static/dist/", "");
+      const file = path.join(distDir, rel);
+      if (existsSync(file) && isWithinDist(file)) {
+        return send(file, guessType(file), "static");
       }
-      return new Response("Not Found", { status: 404 });
+      return new Response("Not found", { status: 404 });
     }
 
-    // Static assets: /static/* -> static/dist/*
-    if (url.pathname.startsWith("/static/")) {
-      let rel = url.pathname.slice("/static/".length);
-      // normalize if client requested /static/dist/*
-      if (rel.startsWith("dist/")) rel = rel.slice("dist/".length);
-      const filePath = path.join(distDir, rel);
-      if (existsSync(filePath)) return fileResponse(filePath, guessType(filePath));
-      return new Response("Not Found", { status: 404 });
-    }
-
-    // Direct files from /public (favicon, pdf, etc.)
-    const maybePublic = path.join(publicDir, url.pathname);
-    if (existsSync(maybePublic) && !maybePublic.endsWith(path.sep)) {
-      return fileResponse(maybePublic, guessType(maybePublic));
-    }
-
-    // SPA fallback (serve index.html for real navigations)
-    const accept = req.headers.get("accept") || "*/*";
-    const wantsHtml = accept.includes("text/html") || accept === "*/*";
-    const hasExtension = path.extname(url.pathname) !== "";
-
-    // If it's "/" always serve HTML
-    if (url.pathname === "/") {
-      const prefer = (process.env.SERVE_INDEX || "").toLowerCase();
-      const builtIndex = path.join(distDir, "index.html");
-      const publicIndex = path.join(publicDir, "index.html");
-
-      if (prefer === "public") {
-        if (existsSync(publicIndex)) return fileResponse(publicIndex, "text/html; charset=utf-8");
-        if (existsSync(builtIndex)) return fileResponse(builtIndex, "text/html; charset=utf-8");
-      } else {
-        if (existsSync(builtIndex)) return fileResponse(builtIndex, "text/html; charset=utf-8");
-        if (existsSync(publicIndex)) return fileResponse(publicIndex, "text/html; charset=utf-8");
+    // Serve any file that exists within distDir for its URL path (e.g., /assets/*, /avatar-me.png, /resume.pdf)
+    if (path.extname(url.pathname)) {
+      const rel = url.pathname.replace(/^\/+/, ""); // drop leading slash
+      const file = path.join(distDir, rel);
+      if (existsSync(file) && isWithinDist(file) && statSync(file).isFile()) {
+        return send(file, guessType(file), "static");
       }
-      return new Response("index.html not found", { status: 404 });
     }
 
-    if (!wantsHtml || hasExtension) {
-      return new Response("Not Found", { status: 404 });
+    // SPA fallback to index.html
+    if (url.pathname === "/" || !path.extname(url.pathname)) {
+      const index = path.join(distDir, "index.html");
+      if (existsSync(index)) return send(index, "text/html; charset=utf-8", "html");
     }
 
-    const builtIndex = path.join(distDir, "index.html");
-    if (existsSync(builtIndex)) return fileResponse(builtIndex, "text/html; charset=utf-8");
-    const publicIndex = path.join(publicDir, "index.html");
-    if (existsSync(publicIndex)) return fileResponse(publicIndex, "text/html; charset=utf-8");
-
-    return new Response("index.html not found", { status: 404 });
+    return new Response("Not found", { status: 404 });
   },
 });
 
-console.log(`➜  Server running on 0.0.0.0:${PORT}`);
+console.log(`➜ Server running on http://0.0.0.0:${PORT}`);

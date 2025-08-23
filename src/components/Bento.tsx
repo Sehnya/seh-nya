@@ -1,16 +1,19 @@
-import "@/public/avatar-me.png"
 import { Mail, Github, Linkedin, Download } from "lucide-react";
 
 export const Bento = () =>
-
-
-    <div className="mt-10 grid gap-4 sm:mt-16 lg:grid-cols-3 lg:grid-rows-2 font-mono">
+  <div className="mt-10 grid gap-4 sm:mt-16 lg:grid-cols-3 lg:grid-rows-2 font-mono">
 
       <div className="relative lg:row-span-2">
         <div className="absolute inset-px rounded-lg bg-gray-500/25 backdrop-blur-lg lg:rounded-l-4xl"></div>
         <div className="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] lg:rounded-l-[calc(2rem+1px)]">
           <div className="px-8 pt-8 pb-3 sm:px-10 sm:pt-10 sm:pb-0 ">
-              <img src={"/avatar-me.png"} alt="avatar" className={"w-60 h-60 justify-self-center"} />
+              <img
+                src="/avatar-me.png"
+                alt="avatar"
+                width={240}
+                height={240}
+                className="w-60 h-60 aspect-square object-cover rounded-full mx-auto"
+              />
             <p className="mt-2 text-3xl font-medium tracking-tight text-white max-lg:text-center">Sehnya Edwards</p>
             <p className="mt-2 max-w-lg text-sm text-white max-lg:text-center">Full-Stack Developer</p>
             <div className="mt-4 flex flex-col items-center gap-2 text-white/90">

@@ -1,10 +1,8 @@
+# railway.toml
 [build]
 builder = "nixpacks"
 buildCommand = "bun install && bun run build"
 
 [deploy]
-startCommand = "bun start"
-healthcheckPath = "/api/hello"   # safer healthcheck, since / may 404 in CI
-
-[env]
-SERVE_INDEX = ""
+startCommand = "bun run ./src/server/index.ts"
+healthcheckPath = "/api/hello"

@@ -1,6 +1,10 @@
+/* src/styles/globals.css */
 @import "tailwindcss";
-@import "tailwindcss/theme";
-@import "tailwindcss-animated";
+
+/* Make detection explicit for v4 so it sees your classes */
+@source "../client/**/*.{ts,tsx,js,jsx}";
+@source "../components/**/*.{ts,tsx,js,jsx}";
+@source "../**/*.html";
 
 
 html, body, #root { height: 100%; }
