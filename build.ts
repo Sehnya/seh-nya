@@ -1,4 +1,6 @@
-import { build, $ } from "bun";
+// build.ts
+import { build } from "bun";
+import tailwind from "bun-plugin-tailwind";
 import path from "path";
 import { rmSync, mkdirSync, existsSync, copyFileSync } from "fs";
 
@@ -13,23 +15,19 @@ mkdirSync(outdir, { recursive: true });
 
 console.log("Building frontend ->", outdir);
 
-// Build Tailwind CSS via CLI (v4)
-await $`bunx tailwindcss -i ./src/styles/globals.css -o ${outdir}/styles.css --minify`;
-
 await build({
-  entrypoints: ["./src/client/main.tsx"],
+  entrypoints: ["./src/client/main.tsx", "./src/styles/globals.css"],
   outdir,
   target: "browser",
   minify: true,
   sourcemap: "external",
-  publicPath: "/static/dist",
-  plugins: [],
+  plugins: [tailwind],
   define: {
     "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || "production"),
   },
 });
 
-// Ensure SPA shell is available at static/dist/index.html
+// Copy index.html
 if (existsSync(publicIndex)) {
   copyFileSync(publicIndex, distIndex);
 }

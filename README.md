@@ -35,7 +35,7 @@ This repo includes a `railway.toml` that instructs Railway to use Bun only.
 
 Nothing else is required in the Railway UI if `railway.toml` is at the repo root. If Railway still shows "no start command", set the same Build/Start commands manually in Build & Deploy.
 
-Tip: keep your Bun lockfile committed so Nixpacks reliably detects Bun.
+Tip: keep your Bun lockfile committed so Nixpacks reliably detects Bun. We standardize on the text bun.lock in this repo (bun.lockb is ignored).
 
 ## Scripts
 - `bun run build`: bundles `src/client/main.tsx` and generates Tailwind CSS to `static/dist/styles.css`.
