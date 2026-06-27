@@ -11,6 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Verify secrets exist
+        run: |
+          if [ -z "${{ secrets.EC2_HOST }}" ]; then echo "EC2_HOST is empty!"; fi
+          if [ -z "${{ secrets.EC2_USER }}" ]; then echo "EC2_USER is empty!"; fi
+          if [ -z "${{ secrets.EC2_SSH_KEY }}" ]; then echo "EC2_SSH_KEY is empty!"; fi
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:
