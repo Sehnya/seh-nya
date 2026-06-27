@@ -1,3 +1,4 @@
+# Auto-deploy to AWS EC2
 name: Deploy to AWS EC2
 
 on:
