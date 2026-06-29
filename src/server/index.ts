@@ -14,7 +14,7 @@ function send(file: string, type: string, cache: "static" | "html" = "static") {
       "content-type": type,
       "content-length": String(stat.size),
       "x-content-type-options": "nosniff",
-      "cache-control": isHtml ? "no-cache" : "public, max-age=31536000, immutable",
+      "cache-control": isHtml ? "no-cache, no-store, must-revalidate" : "no-cache",
     },
   });
 }

@@ -41,15 +41,22 @@ if (existsSync(nestedJsA)) {
   copyFileSync(nestedJsB, rootJs);
 }
 
-// Emit exactly one index.html referencing built assets
+// Emit exactly one index.html referencing built assets with cache-busting
+const cacheBust = Date.now();
 const html = `<!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>seh-nya</title>
-<link rel="stylesheet" href="/static/dist/globals.css"/>
+<title>SEHNYA</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bayon&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/static/dist/globals.css?v=${cacheBust}"/>
 </head>
 <body class="min-h-screen"><div id="root"></div>
-<script type="module" src="/static/dist/main.js"></script>
+<script type="module" src="/static/dist/main.js?v=${cacheBust}"></script>
 </body></html>`;
 writeFileSync(path.join(outdir, "index.html"), html);
 

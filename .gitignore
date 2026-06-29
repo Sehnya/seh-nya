@@ -7,3 +7,4 @@ static/dist/
 # Stray legacy bundles (should not exist; server serves from static/dist only)
 static/main.js
 static/main.js.map
+node_modules
